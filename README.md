@@ -161,7 +161,6 @@ curl -X POST https://your-api-url.amazonaws.com/generate \
 .
 ├── src/
 │   ├── index.ts          # Main Lambda handler with Genkit flow
-│   └── local-test.ts     # Local testing utilities (optional)
 ├── serverless.yml        # Serverless Framework configuration
 ├── tsconfig.json         # TypeScript configuration
 ├── package.json          # Dependencies and scripts
