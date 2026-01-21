@@ -171,7 +171,6 @@ Or use the test script:
 ├── serverless.yml        # Serverless Framework configuration
 ├── tsconfig.json         # TypeScript configuration
 ├── package.json          # Dependencies and scripts
-├── .env.example          # Environment variables template
 └── README.md             # This file
 ```
 
