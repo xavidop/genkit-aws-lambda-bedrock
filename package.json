@@ -1,0 +1,41 @@
+{
+  "name": "genkit-aws-lambda-bedrock",
+  "version": "1.0.0",
+  "description": "AWS Lambda with Genkit and AWS Bedrock for AI generation",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "serverless offline",
+    "start": "tsx src/index.ts",
+    "genkit:ui": "genkit start -- tsx --watch src/index.ts",
+    "deploy": "serverless deploy",
+    "deploy:prod": "serverless deploy --stage prod",
+    "remove": "serverless remove",
+    "logs": "serverless logs -f storyGenerator -t",
+    "info": "serverless info"
+  },
+  "keywords": [
+    "genkit",
+    "aws",
+    "lambda",
+    "bedrock",
+    "ai",
+    "generative-ai"
+  ],
+  "author": "Xavier Portilla Edo",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "genkit": "^1.24.0",
+    "genkitx-aws-bedrock": "^1.11.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^20.17.10",
+    "typescript": "^5.7.2",
+    "tsx": "^4.19.2",
+    "serverless": "^3.39.0",
+    "serverless-offline": "^13.8.1",
+    "serverless-esbuild": "^1.54.3",
+    "esbuild": "^0.24.2"
+  }
+}
