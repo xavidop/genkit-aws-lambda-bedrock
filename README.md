@@ -155,12 +155,6 @@ curl -X POST https://your-api-url.amazonaws.com/generate \
   }'
 ```
 
-Or use the test script:
-
-```bash
-./test-lambda.sh https://your-api-url.amazonaws.com/generate
-```
-
 ## Project Structure
 
 ```
