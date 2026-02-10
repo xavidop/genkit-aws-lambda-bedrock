@@ -1,6 +1,6 @@
 # Genkit AWS Lambda with Bedrock
 
-An AWS Lambda function powered by [Firebase Genkit](https://genkit.dev/) and the [AWS Bedrock plugin](https://github.com/xavidop/genkitx-aws-bedrock) for AI-powered story generation.
+An AWS Lambda function powered by [Genkit](https://genkit.dev/) and the [AWS Bedrock plugin](https://github.com/xavidop/genkitx-aws-bedrock) for AI-powered story generation.
 
 ## Prerequisites
 
@@ -221,7 +221,7 @@ Run `npm install` to ensure all dependencies are installed, including type defin
 
 ## Learn More
 
-- [Firebase Genkit Documentation](https://genkit.dev/docs/)
+- [Genkit Documentation](https://genkit.dev/docs/)
 - [AWS Bedrock Plugin](https://github.com/xavidop/genkitx-aws-bedrock)
 - [Serverless Framework Documentation](https://www.serverless.com/framework/docs)
 - [AWS Bedrock](https://aws.amazon.com/bedrock/)
