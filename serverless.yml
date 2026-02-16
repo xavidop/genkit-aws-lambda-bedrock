@@ -1,7 +1,5 @@
 service: genkit-aws-lambda-bedrock
 
-frameworkVersion: '3'
-
 provider:
   name: aws
   runtime: nodejs20.x
@@ -23,13 +21,22 @@ provider:
             - 'arn:aws:bedrock:*:*:inference-profile/*'
   logRetentionInDays: 7
 
+build:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    exclude:
+      - '@aws-sdk/*'
+    target: node20
+    platform: node
+
 plugins:
-  - serverless-esbuild
   - serverless-offline
 
 functions:
   storyGenerator:
-    handler: src/index.handler
+    handler: src/index.storyGeneratorHandler
     description: Genkit-powered story generator using AWS Bedrock
     events:
       - httpApi:
@@ -39,17 +46,25 @@ functions:
           path: /generate
           method: options
 
+  jokeGenerator:
+    handler: src/index.jokeHandler
+    description: Genkit-powered joke generator using AWS Bedrock
+    events:
+      - httpApi:
+          path: /joke
+          method: post
+      - httpApi:
+          path: /joke
+          method: options
+
+  jokeStream:
+    handler: src/index.jokeStreamHandler
+    description: Streaming joke generator using Lambda Function URL
+    url:
+      invokeMode: RESPONSE_STREAM
+      cors: true
+
 custom:
-  esbuild:
-    bundle: true
-    minify: false
-    sourcemap: true
-    target: node20
-    platform: node
-    format: cjs
-    mainFields: ['module', 'main']
-    exclude:
-      - '@aws-sdk/*'
   serverless-offline:
     httpPort: 3000
     host: 0.0.0.0

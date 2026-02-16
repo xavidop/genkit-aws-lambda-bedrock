@@ -1,6 +1,6 @@
 # Genkit AWS Lambda with Bedrock
 
-An AWS Lambda function powered by [Genkit](https://genkit.dev/) and the [AWS Bedrock plugin](https://github.com/xavidop/genkitx-aws-bedrock) for AI-powered story generation.
+An AWS Lambda function powered by [Genkit](https://genkit.dev/) and the [AWS Bedrock plugin](https://github.com/genkit-ai/aws-bedrock-js-plugin) for AI-powered story and joke generation, using the new `onCallGenkit` helper for seamless Lambda deployment.
 
 ## Prerequisites
 
@@ -42,9 +42,23 @@ This starts a local server at `http://localhost:3000` that mimics API Gateway. T
 curl -X POST http://localhost:3000/generate \
   -H "Content-Type: application/json" \
   -d '{
-    "topic": "a robot learning to feel emotions",
-    "style": "sci-fi",
-    "length": "medium"
+    "data": {
+      "topic": "a robot learning to feel emotions",
+      "style": "sci-fi",
+      "length": "medium"
+    }
+  }'
+```
+
+You can also call the joke flow:
+
+```bash
+curl -X POST http://localhost:3000/joke \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "subject": "programming"
+    }
   }'
 ```
 
@@ -66,6 +80,20 @@ This starts the Genkit Developer UI at `http://localhost:4000`. You can:
 
 ### Request Format
 
+The handler follows the Genkit callable protocol. Wrap your input in a `data` field:
+
+```json
+{
+  "data": {
+    "topic": "a time traveler discovering an ancient civilization",
+    "style": "mystery",
+    "length": "short"
+  }
+}
+```
+
+Direct input is also supported for convenience:
+
 ```json
 {
   "topic": "a time traveler discovering an ancient civilization",
@@ -81,15 +109,27 @@ This starts the Genkit Developer UI at `http://localhost:4000`. You can:
 
 ### Response Format
 
+Successful response:
+
 ```json
 {
-  "success": true,
-  "data": {
+  "result": {
     "title": "Echoes of Atlantis",
     "genre": "Mystery",
     "story": "The full story text...",
     "wordCount": 287,
     "themes": ["time travel", "ancient mysteries", "discovery"]
+  }
+}
+```
+
+Error response:
+
+```json
+{
+  "error": {
+    "status": "INTERNAL",
+    "message": "Failed to generate story"
   }
 }
 ```
@@ -109,9 +149,14 @@ This deploys to the `dev` stage by default. After deployment, you'll see output 
 ```
 endpoints:
   POST - https://abc123.execute-api.us-east-1.amazonaws.com/generate
+  POST - https://abc123.execute-api.us-east-1.amazonaws.com/joke
 functions:
   storyGenerator: genkit-aws-lambda-bedrock-dev-storyGenerator
+  jokeGenerator: genkit-aws-lambda-bedrock-dev-jokeGenerator
+  jokeStream: genkit-aws-lambda-bedrock-dev-jokeStream
 ```
+
+The streaming handler (`jokeStream`) uses a Lambda Function URL printed separately.
 
 ### Deploy to Production
 
@@ -149,9 +194,11 @@ npm run remove
 curl -X POST https://your-api-url.amazonaws.com/generate \
   -H "Content-Type: application/json" \
   -d '{
-    "topic": "a robot learning to feel emotions",
-    "style": "sci-fi",
-    "length": "medium"
+    "data": {
+      "topic": "a robot learning to feel emotions",
+      "style": "sci-fi",
+      "length": "medium"
+    }
   }'
 ```
 
@@ -160,7 +207,7 @@ curl -X POST https://your-api-url.amazonaws.com/generate \
 ```
 .
 ├── src/
-│   ├── index.ts          # Main Lambda handler with Genkit flow
+│   ├── index.ts          # Genkit flows + Lambda handlers via onCallGenkit
 ├── serverless.yml        # Serverless Framework configuration
 ├── tsconfig.json         # TypeScript configuration
 ├── package.json          # Dependencies and scripts
@@ -174,12 +221,38 @@ curl -X POST https://your-api-url.amazonaws.com/generate \
 Edit `src/index.ts` to use different Bedrock models:
 
 ```typescript
-import { awsBedrock, anthropicClaude35SonnetV2 } from 'genkitx-aws-bedrock';
+import { awsBedrock, anthropicClaude35SonnetV2, onCallGenkit } from 'genkitx-aws-bedrock';
 
 const ai = genkit({
   plugins: [awsBedrock({ region: 'us-east-1' })],
   model: anthropicClaude35SonnetV2, // Change model here
 });
+```
+
+### How onCallGenkit Works
+
+The `onCallGenkit` helper (from the AWS Bedrock plugin) wraps any Genkit flow as an AWS Lambda handler, handling CORS, request parsing, and error formatting automatically:
+
+```typescript
+import { onCallGenkit } from 'genkitx-aws-bedrock';
+
+// Simple usage - just wrap a flow
+export const handler = onCallGenkit(myFlow);
+
+// With options
+export const handler = onCallGenkit(
+  {
+    cors: { origin: '*' },
+    debug: true,
+  },
+  myFlow
+);
+
+// Streaming (requires Lambda Function URL with RESPONSE_STREAM)
+export const streamHandler = onCallGenkit(
+  { streaming: true, cors: { origin: '*' } },
+  myStreamingFlow
+);
 ```
 
 ### Adjusting Lambda Resources
@@ -222,7 +295,8 @@ Run `npm install` to ensure all dependencies are installed, including type defin
 ## Learn More
 
 - [Genkit Documentation](https://genkit.dev/docs/)
-- [AWS Bedrock Plugin](https://github.com/xavidop/genkitx-aws-bedrock)
+- [AWS Bedrock Plugin](https://github.com/genkit-ai/aws-bedrock-js-plugin)
+- [Genkit Client Library](https://genkit.dev/docs/client/)
 - [Serverless Framework Documentation](https://www.serverless.com/framework/docs)
 - [AWS Bedrock](https://aws.amazon.com/bedrock/)
 
